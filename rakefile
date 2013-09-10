@@ -1,0 +1,49 @@
+require_relative "curriculous_config"
+
+task :default => [:help]
+
+desc "Print out help text to use this rakefile"
+task :help do
+	puts `rake -T`
+end
+
+desc "Check Configuration settings"
+task :check do
+end
+
+desc "Display Configuration settings"
+task :display_config do
+end
+
+desc "Deploy the website to AWS, by copyingall the files from local to server"
+task :deploy do
+	sh "s3cmd sync --delete-removed output/ s3://#{AWS_BUCKET}/" + (ENV["go"] ? "" : " --dry-run")
+end
+
+desc "Update or pull files from content and topic directories here for building"
+task :pull_files do
+end
+
+desc "Push files to content and topic directories"
+task :push_files do
+end
+
+desc "compile course locally"
+task :compile do
+	sh "nanoc compile"
+end
+
+desc "run local server"
+task :serve do
+	sh "nanoc view"
+end
+
+desc "recompile automatically"
+task :guard do
+	sh "guard -i"
+end
+
+desc "view in browser"
+task :view do
+	sh "open http://0.0.0.0:3000"
+end
