@@ -1,6 +1,8 @@
 require 'pry'
 
 require 'erb'
+require 'rake/clean'
+
 CONF_FILE_PATH = "config/config_curr.rb"
 CONF_FILE_PATH_TEMPLATE = "rake/config_curr.erb"
 RUN_CONF_PATH = "lib/runtime_config.rb"
@@ -35,6 +37,13 @@ def write_runtime_config
 		end
 	end
 end
+
+def prep_cleanlist
+	CLEAN.include("content/**/*", "config/config_curr.rb")
+	CLEAN.exclude("content/bootstrap", "content/bootstrap/*", "content/bootstrap/**/*")
+end
+
+
 
 def blank? var
 	var.nil? || var.length == 0

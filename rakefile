@@ -1,7 +1,10 @@
 #Srequire 'pry'
 require_relative "rake/rake_helper"
+prep_cleanlist
+
 verify_environment
 
+#  RAKE TASKS BEGIN HERE
 
 desc "Print out help for this rakefile"
 task :default => [:help]
