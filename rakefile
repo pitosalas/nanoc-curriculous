@@ -1,8 +1,9 @@
-#Srequire 'pry'
+require 'pry'
 require_relative "rake/rake_helper"
-prep_cleanlist
 
-verify_environment
+include RakeHelpers
+verify_environment unless Rake.application.top_level_tasks[0] == "conf:declare"
+prepare_cleanlist
 
 #  RAKE TASKS BEGIN HERE
 
@@ -15,41 +16,48 @@ task :help do
 end
 
 namespace 'conf' do
+
 	desc "Declare associated content directory"
 	task :declare do |t, args|
 		content_dir = ENV['dir']
-		fail "Specify content directory with dir='/my/dir'" if content_dir.nil?
+		fail "Error: Specify content directory with dir='/my/dir'" if content_dir.nil?
 		if File.exist?(CONF_FILE_PATH)
 			puts "[Overwriting previous local config file at '#{CONF_FILE_PATH}']"
 		end
+		require "#{content_dir}/configure.rb"
 		write_config_file(content_dir)
 		write_runtime_config
 	end
 
 	desc "Check Configuration settings"
 	task :check do
-		puts (config_ok? ? "Ok." : "Config invalid.")
+		puts (config_ok? ? "[Config Ok.]" : "[Config invalid.]")
 	end
 
 	desc "Display Configuration settings"
 	task :show do
 		puts "Curriculous Configuration:\n"
+		puts "  Course Name:               #{COURSE_NAME}"
 		puts "  Content path:              #{CONTENT_PATH}"
 		puts "  Target AWS Bucket:         #{AWS_BUCKET}"
-		puts "  Related Topics directory:  #{TOPICS_DIR}"
+		puts "  Related Topics directory:  #{TOPICS_PATH}"
 		puts "  Copyright string:          \"#{COPYRIGHT_STRING}\""
 	end
 end
 
-namespace 'stage' do
-
-  desc "reset local state. Delete all content, layouts and topics"
-  task :reset do
-
-  end
+namespace 'content' do
 
 	desc "grab files from authoring directories into staging area"
-	task :grab do
+	task :grab => [:grab_content, :grab_topics]
+
+	task :grab_content do
+		content_files = Rake::FileList.new(content_master+"*.erb", content_master+"**/*.erb")
+		smart_copy_files(content_files, content_master, content_working)
+	end
+
+	task :grab_topics do
+		topic_files = Rake::FileList.new(topics_master+"*.erb", topics_master+"**/*.erb")
+		smart_copy_files(topic_files, topics_master, topics_working)
 	end
 
 	desc "ungrab (return) files back to authoring directories"
