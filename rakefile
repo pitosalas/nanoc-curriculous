@@ -47,22 +47,36 @@ end
 
 namespace 'content' do
 
-	desc "grab files from authoring directories into staging area"
-	task :grab => [:grab_content, :grab_topics]
+	desc "pull files from master directories"
+	task :pull => [:pull_content, :pull_topics]
 
-	task :grab_content do
+	desc "pull just the content files from master directory"
+	task :pull_content do
 		content_files = Rake::FileList.new(content_master+"*.erb", content_master+"**/*.erb")
 		smart_copy_files(content_files, content_master, content_working)
 	end
 
-	task :grab_topics do
+	desc "pull just the topics files from master directory"
+	task :pull_topics do
 		topic_files = Rake::FileList.new(topics_master+"*.erb", topics_master+"**/*.erb")
 		smart_copy_files(topic_files, topics_master, topics_working)
 	end
 
-	desc "ungrab (return) files back to authoring directories"
-	task :ungrab do
+	desc "push files back to master directories"
+	task :push => [:push_content, :push_topics]
+
+	desc "push just the content files back to master directory"
+	task :push_content do
+		content_files = Rake::FileList.new(content_working+"*.erb", content_working+"**/*.erb")
+		smart_copy_files(content_files, content_working, content_master)
 	end
+
+	desc "push just the topics files back to master directory"
+	task :push_topics do
+		topic_files = Rake::FileList.new(topics_working+"*.erb", topics_working+"**/*.erb")
+		smart_copy_files(topic_files, topics_working, topics_master)
+	end
+
 end
 
 namespace 'nanoc' do
